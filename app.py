@@ -1,5 +1,6 @@
 """
 极简 Flask Web 应用 — CI/CD 实验演示
+shz
 """
 from flask import Flask, render_template_string
 
@@ -41,6 +42,7 @@ HTML = """<!DOCTYPE html>
             <p><span>容器 ID：</span>{{ hostname }}</p>
             <p><span>部署时间：</span>{{ deploy_time }}</p>
             <p><span>环境：</span>{{ environment }}</p>
+            <p><span>环境：</span>宋宏正</p>
         </div>
     </div>
 </body>
