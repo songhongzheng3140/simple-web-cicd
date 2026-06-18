@@ -1,0 +1,41 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]  # 当 main 分支有推送时触发
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 检出代码
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2. 登录 Docker Hub（需替换 secrets）
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}  # 在 Settings-Secrets 中配置
+          password: ${{ secrets.DOCKER_PASSWORD }}  # 在 Settings-Secrets 中配置
+
+      # 3. 构建并推送 Docker 镜像
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: songhongzheng3140/simple-web-cicd:latest  # 改成你的 Docker ID
+
+      # 4. 部署到云服务器（需替换 secrets）
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.SERVER_HOST }}          # 服务器公网 IP
+          username: ${{ secrets.SERVER_USER }}      # 服务器用户名，如 root
+          password: ${{ secrets.SERVER_PASSWORD }}  # 服务器密码
+          script: |
+            docker pull songhongzheng3140/simple-web-cicd:latest
+            docker stop simple-web || true
+            docker rm simple-web || true
+            docker run -d -p 80:5000 --name simple-web songhongzheng3140/simple-web-cicd:latest
